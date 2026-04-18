@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Player Narrativo — TP03</title>
+
+  <!-- Fontes -->
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     CABEÇALHO
+═══════════════════════════════════════════ -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="brand-tag">TP03</span>
+      <span class="brand-name">Player Narrativo</span>
+    </div>
+    <div class="header-meta">ISPTEC · 2025</div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════
+     ECRÃ PRINCIPAL
+═══════════════════════════════════════════ -->
+<main class="main-layout">
+
+  <!-- ── Título da narrativa ── -->
+  <div class="narrative-header">
+    <div class="narrative-eyebrow" id="narrative-eyebrow">Narrativa Multimédia</div>
+    <h1 class="narrative-title" id="narrative-title">Hoji Ya Henda</h1>
+    <p class="narrative-sub" id="narrative-sub">A realidade que poucos querem ver</p>
+  </div>
+
+  <!-- ── PLAYER ── -->
+  <div class="player-wrapper" id="player-wrapper">
+
+    <!-- Vídeo -->
+    <div class="video-stage" id="video-stage">
+
+      <!-- Tag de vídeo nativa -->
+      <!--
+        COMO ADICIONAR O TEU VÍDEO:
+        1. Coloca o ficheiro .mp4 dentro da pasta /video/
+        2. Muda o atributo src abaixo para o nome do teu ficheiro
+           Exemplo: src="video/meu_video.mp4"
+      -->
+      <video
+        id="main-video"
+        preload="metadata"
+        playsinline
+      >
+        <source src="video/video.mp4" type="video/mp4" />
+        O teu browser não suporta a tag de vídeo HTML5.
+      </video>
+
+      <!-- Overlay de legendas
+           As legendas são injectadas aqui por JavaScript
+           em sincronização com o tempo do vídeo -->
+      <div class="subtitle-overlay" id="subtitle-overlay">
+        <span class="subtitle-text" id="subtitle-text"></span>
+      </div>
+
+      <!-- Indicador de modo -->
+      <div class="mode-indicator" id="mode-indicator">
+        <span class="mode-dot"></span>
+        <span class="mode-label" id="mode-label">Modo Visual</span>
+      </div>
+
+      <!-- Overlay de play (clique no vídeo) -->
+      <div class="play-overlay" id="play-overlay" onclick="togglePlay()">
+        <div class="play-overlay-icon" id="play-overlay-icon">▶</div>
+      </div>
+    </div>
+
+    <!-- ── Barra de progresso ── -->
+    <div class="progress-bar-wrap" id="progress-wrap">
+      <div class="progress-bar" id="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+        <div class="progress-thumb" id="progress-thumb"></div>
+      </div>
+      <div class="time-display">
+        <span id="time-current">0:00</span>
+        <span id="time-total">0:00</span>
+      </div>
+    </div>
+
+    <!-- ── Controlos principais ── -->
+    <div class="controls-row">
+
+      <!-- Grupo esquerdo: controlos de playback -->
+      <div class="ctrl-group">
+
+        <!-- Play / Pause -->
+        <button class="ctrl-btn ctrl-primary" id="btn-play" onclick="togglePlay()" title="Play / Pausa">
+          <span id="play-icon">▶</span>
+        </button>
+
+        <!-- Parar (volta ao início) -->
+        <button class="ctrl-btn" id="btn-stop" onclick="stopVideo()" title="Parar (voltar ao início)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="2" y="2" width="12" height="12" rx="1"/>
+          </svg>
+        </button>
+
+        <!-- Retroceder 10s -->
+        <button class="ctrl-btn" id="btn-back" onclick="seek(-10)" title="Recuar 10 segundos">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.46"></path>
+            <text x="8" y="15" font-size="7" fill="currentColor" stroke="none" font-family="sans-serif">10</text>
+          </svg>
+        </button>
+
+        <!-- Avançar 10s -->
+        <button class="ctrl-btn" id="btn-fwd" onclick="seek(10)" title="Avançar 10 segundos">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-.49-3.46"></path>
+            <text x="8" y="15" font-size="7" fill="currentColor" stroke="none" font-family="sans-serif">10</text>
+          </svg>
+        </button>
+
+        <!-- Volume -->
+        <div class="volume-group">
+          <button class="ctrl-btn" id="btn-mute" onclick="toggleMute()" title="Mudo / Som">
+            <span id="volume-icon">🔊</span>
+          </button>
+          <input
+            type="range"
+            class="volume-slider"
+            id="volume-slider"
+            min="0" max="1" step="0.05" value="1"
+            oninput="setVolume(this.value)"
+            title="Volume"
+          />
+        </div>
+      </div>
+
+      <!-- Grupo direito: modo de apresentação -->
+      <div class="ctrl-group ctrl-group-right">
+
+        <!-- Toggle de modo: V1 / V2 -->
+        <div class="mode-toggle-wrap">
+          <span class="mode-toggle-label">Modo</span>
+          <div class="mode-toggle" id="mode-toggle" onclick="toggleMode()" title="Alternar entre Versão 1 e Versão 2">
+            <div class="toggle-track">
+              <span class="toggle-option active" id="toggle-v1">V1</span>
+              <span class="toggle-option" id="toggle-v2">V2</span>
+              <div class="toggle-thumb" id="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botão de ecrã inteiro -->
+        <button class="ctrl-btn" onclick="toggleFullscreen()" title="Ecrã completo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- ── Painel de estado do modo ── -->
+    <div class="mode-panel" id="mode-panel">
+      <div class="mode-panel-v1 active" id="mode-panel-v1">
+        <span class="mp-icon">👁</span>
+        <div>
+          <strong>Versão 1 — Narrativa Visual</strong>
+          <p>Sem áudio · Sem legendas. Interpreta a história apenas através das imagens.</p>
+        </div>
+      </div>
+      <div class="mode-panel-v2" id="mode-panel-v2">
+        <span class="mp-icon">🎧</span>
+        <div>
+          <strong>Versão 2 — Narrativa Enriquecida</strong>
+          <p>Com áudio e legendas sincronizadas. Carrega o ficheiro VTT para activar as legendas.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /player-wrapper -->
+
+  <!-- ── Painel de ficheiros ── -->
+  <div class="file-panel">
+    <div class="file-panel-title">
+      <span>📁</span> Ficheiros da narrativa
+    </div>
+    <div class="file-row">
+      <!-- Vídeo -->
+      <div class="file-drop" id="fd-video">
+        <input type="file" accept="video/*" onchange="loadVideo(this)" />
+        <span class="fd-icon">🎬</span>
+        <div class="fd-label"><strong>Carregar vídeo</strong></div>
+        <div class="fd-hint">MP4 · MOV · WebM</div>
+      </div>
+
+      <!-- Legendas VTT -->
+      <div class="file-drop" id="fd-subs">
+        <input type="file" accept=".vtt,.srt" onchange="loadSubtitles(this)" />
+        <span class="fd-icon">💬</span>
+        <div class="fd-label"><strong>Carregar legendas</strong></div>
+        <div class="fd-hint">VTT · SRT</div>
+      </div>
+
+      <!-- Áudio extra (opcional) -->
+      <div class="file-drop" id="fd-audio">
+        <input type="file" accept="audio/*" onchange="loadAudio(this)" />
+        <span class="fd-icon">🎙️</span>
+        <div class="fd-label"><strong>Áudio extra</strong></div>
+        <div class="fd-hint">MP3 · WAV · M4A</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Navegação por cenas ── -->
+  <div class="scenes-panel">
+    <div class="scenes-title">Momentos narrativos</div>
+    <div class="scenes-row" id="scenes-row">
+      <!-- Gerado automaticamente por JS com base na duração do vídeo -->
+    </div>
+    <p class="scenes-hint">Clica numa cena para avançar directamente para esse momento.</p>
+  </div>
+
+</main>
+
+<!-- ═══════════════════════════════════════════
+     SCRIPT PRINCIPAL
+═══════════════════════════════════════════ -->
+<script src="script.js"></script>
+</body>
+</html>
