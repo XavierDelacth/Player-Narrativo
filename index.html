@@ -205,6 +205,46 @@
     </div>
   </div>
 
+  <!-- ══════════════════════════════════════
+       SECÇÃO DE RÁDIO ANGOLA
+  ══════════════════════════════════════ -->
+  <div class="radio-section">
+    <div class="radio-section-header">
+      <div class="radio-eyebrow">
+        <span class="radio-live-dot"></span>
+        Em Directo
+      </div>
+      <h2 class="radio-title">Rádios de Angola</h2>
+      <p class="radio-sub">32 estações ao vivo · Carrega numa rádio para ouvir</p>
+    </div>
+
+    <div class="radio-notice">
+      <span>ℹ️</span>
+      <span>Alguns streams podem requerer permissão do browser para áudio. Se não tocar, clica no ícone de cadeado na barra de endereço e permite áudio.</span>
+    </div>
+
+    <div class="radio-grid" id="radio-grid"></div>
+
+    <!-- Player de rádio fixo em baixo -->
+    <div class="radio-now-playing" id="radio-now-playing">
+      <div class="rnp-left">
+        <div class="rnp-visualizer" id="rnp-visualizer">
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <div class="rnp-info">
+          <div class="rnp-station" id="rnp-station">Nenhuma estação seleccionada</div>
+          <div class="rnp-freq" id="rnp-freq">—</div>
+        </div>
+      </div>
+      <div class="rnp-controls">
+        <button class="rnp-btn" id="rnp-play-btn" onclick="radioTogglePlay()">▶</button>
+        <input type="range" class="rnp-vol" id="rnp-vol" min="0" max="1" step="0.05" value="0.8"
+          oninput="radioSetVolume(this.value)" title="Volume rádio" />
+        <button class="rnp-btn rnp-stop" onclick="radioStop()" title="Parar rádio">■</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Navegação por cenas -->
   <div class="scenes-panel">
     <div class="scenes-title">Momentos narrativos</div>
