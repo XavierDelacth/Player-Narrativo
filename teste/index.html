@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Xavier Player — TP03</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Outfit:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-brand">
+      <span class="brand-tag">Ele Dmeu</span>
+      <span class="brand-name">Xavier Player</span>
+    </div>
+    <div class="header-meta">Dança só ma bo * 2026</div>
+  </div>
+</header>
+
+<main class="main-layout">
+
+  <!-- Título da narrativa -->
+  <div class="narrative-header">
+    <div class="narrative-eyebrow">Narrativa Multimédia Interativa</div>
+    <h1 class="narrative-title">Xavier <em>Player</em></h1>
+    <p class="narrative-sub">Carrega o teu vídeo e apresenta a tua história em duas versões</p>
+  </div>
+
+  <!-- PLAYER -->
+  <div class="player-wrapper" id="player-wrapper">
+
+    <!-- Vídeo -->
+    <div class="video-stage" id="video-stage">
+      <video id="main-video" preload="metadata" playsinline>
+        <source src="video/video.mp4" type="video/mp4" />
+        O teu browser não suporta HTML5 video.
+      </video>
+
+      <!-- Overlay de legendas -->
+      <div class="subtitle-overlay" id="subtitle-overlay">
+        <span class="subtitle-text" id="subtitle-text"></span>
+      </div>
+
+      <!-- Indicador de modo -->
+      <div class="mode-indicator" id="mode-indicator">
+        <span class="mode-dot"></span>
+        <span class="mode-label" id="mode-label">Modo Visual</span>
+      </div>
+
+      <!-- Overlay de play -->
+      <div class="play-overlay" id="play-overlay" onclick="togglePlay()">
+        <div class="play-overlay-icon" id="play-overlay-icon">▶</div>
+      </div>
+    </div>
+
+    <!-- Barra de progresso -->
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="progress-bar">
+        <div class="progress-fill" id="progress-fill"></div>
+        <div class="progress-thumb" id="progress-thumb"></div>
+      </div>
+      <div class="time-display">
+        <span id="time-current">0:00</span>
+        <span id="time-total">0:00</span>
+      </div>
+    </div>
+
+    <!-- Controlos principais -->
+    <div class="controls-row">
+      <div class="ctrl-group">
+        <button class="ctrl-btn ctrl-primary" id="btn-play" onclick="togglePlay()" title="Play / Pausa">
+          <span id="play-icon">▶</span>
+        </button>
+        <button class="ctrl-btn" onclick="stopVideo()" title="Parar">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <rect x="2" y="2" width="12" height="12" rx="1"/>
+          </svg>
+        </button>
+        <button class="ctrl-btn" onclick="seek(-10)" title="Recuar 10s">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="1 4 1 10 7 10"></polyline>
+            <path d="M3.51 15a9 9 0 1 0 .49-3.46"></path>
+            <text x="8" y="15" font-size="7" fill="currentColor" stroke="none" font-family="sans-serif">10</text>
+          </svg>
+        </button>
+        <button class="ctrl-btn" onclick="seek(10)" title="Avançar 10s">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-.49-3.46"></path>
+            <text x="8" y="15" font-size="7" fill="currentColor" stroke="none" font-family="sans-serif">10</text>
+          </svg>
+        </button>
+        <div class="volume-group">
+          <button class="ctrl-btn" id="btn-mute" onclick="toggleMute()" title="Mudo / Som">
+            <span id="volume-icon">🔇</span>
+          </button>
+          <input type="range" class="volume-slider" id="volume-slider"
+            min="0" max="1" step="0.05" value="1"
+            oninput="setVolume(this.value)" title="Volume" />
+        </div>
+      </div>
+
+      <div class="ctrl-group ctrl-group-right">
+        <div class="mode-toggle-wrap">
+          <span class="mode-toggle-label">Modo</span>
+          <div class="mode-toggle" id="mode-toggle" onclick="toggleMode()" title="Alternar V1 / V2">
+            <div class="toggle-track">
+              <span class="toggle-option active" id="toggle-v1">V1</span>
+              <span class="toggle-option" id="toggle-v2">V2</span>
+              <div class="toggle-thumb" id="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+        <button class="ctrl-btn" onclick="toggleFullscreen()" title="Ecrã completo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <polyline points="9 21 3 21 3 15"></polyline>
+            <line x1="21" y1="3" x2="14" y2="10"></line>
+            <line x1="3" y1="21" x2="10" y2="14"></line>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         PAINEL V2 — Botões de Ativar Áudio e Legendas
+         Só aparece quando o modo V2 está activo
+    ══════════════════════════════════════ -->
+    <div class="v2-controls" id="v2-controls">
+      <div class="v2-controls-label">Controlos da Versão 2</div>
+      <div class="v2-btn-row">
+
+        <!-- Botão Ativar Áudio -->
+        <button
+          class="v2-btn"
+          id="btn-audio"
+          onclick="toggleAudio()"
+          title="Ativar / Desativar Áudio"
+        >
+          <span class="v2-btn-icon" id="audio-icon">🔇</span>
+          <span class="v2-btn-label">Ativar Áudio</span>
+          <span class="v2-btn-badge" id="badge-audio">OFF</span>
+        </button>
+
+        <!-- Botão Ativar Legendas -->
+        <button
+          class="v2-btn"
+          id="btn-subs"
+          onclick="toggleSubtitles()"
+          title="Ativar / Desativar Legendas"
+        >
+          <span class="v2-btn-icon" id="subs-icon">💬</span>
+          <span class="v2-btn-label">Adicionar Legendas</span>
+          <span class="v2-btn-badge" id="badge-subs">OFF</span>
+        </button>
+
+      </div>
+    </div>
+
+    <!-- Painel de estado do modo -->
+    <div class="mode-panel" id="mode-panel">
+      <div class="mode-panel-v1 active" id="mode-panel-v1">
+        <span class="mp-icon">👁</span>
+        <div>
+          <strong>Versão 1 — Narrativa Visual</strong>
+          <p>Sem áudio · Sem legendas. Interpreta a história apenas através das imagens.</p>
+        </div>
+      </div>
+      <div class="mode-panel-v2" id="mode-panel-v2">
+        <span class="mp-icon">🎧</span>
+        <div>
+          <strong>Versão 2 — Narrativa Enriquecida</strong>
+          <p>Usa os botões acima para ativar o áudio e as legendas de forma independente.</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /player-wrapper -->
+
+  <!-- Painel de ficheiros -->
+  <div class="file-panel">
+    <div class="file-panel-title"><span>📁</span> Ficheiros da narrativa</div>
+    <div class="file-row">
+      <div class="file-drop" id="fd-video">
+        <input type="file" accept="video/*" onchange="loadVideo(this)" />
+        <span class="fd-icon">🎬</span>
+        <div class="fd-label"><strong>Carregar vídeo</strong></div>
+        <div class="fd-hint">MP4 · MOV · WebM</div>
+      </div>
+      <div class="file-drop" id="fd-audio">
+        <input type="file" accept="audio/*" onchange="loadAudio(this)" />
+        <span class="fd-icon">🎙️</span>
+        <div class="fd-label"><strong>Carregar áudio</strong></div>
+        <div class="fd-hint">MP3 · WAV · M4A</div>
+      </div>
+      <div class="file-drop" id="fd-subs">
+        <input type="file" accept=".vtt,.srt" onchange="loadSubtitles(this)" />
+        <span class="fd-icon">💬</span>
+        <div class="fd-label"><strong>Carregar legendas</strong></div>
+        <div class="fd-hint">VTT · SRT</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navegação por cenas -->
+  <div class="scenes-panel">
+    <div class="scenes-title">Momentos narrativos</div>
+    <div class="scenes-row" id="scenes-row"></div>
+    <p class="scenes-hint">Clica numa cena para avançar directamente para esse momento.</p>
+  </div>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
